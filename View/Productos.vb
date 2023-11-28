@@ -13,8 +13,8 @@ Namespace TacticaSoft
 
         Public Sub New()
             InitializeComponent()
-
             VerProductos()
+            llenarCmbCategorias()
         End Sub
 
 
@@ -35,6 +35,7 @@ Namespace TacticaSoft
 
         Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
             AgregarProducto()
+            llenarCmbCategorias()
         End Sub
 
 
@@ -64,6 +65,7 @@ Namespace TacticaSoft
             If ID_Producto <> vbEmpty Then
                 EliminarProductoPorID(ID_Producto)
                 VerProductos()
+                llenarCmbCategorias()
             Else
                 MsgBox("Debe Seleccionar un registro")
             End If
@@ -79,6 +81,7 @@ Namespace TacticaSoft
             If ID_Producto <> vbEmpty Then
                 ModificarProducto()
                 VerProductos()
+                llenarCmbCategorias()
             Else
                 MsgBox("Debe Seleccionar un registro")
             End If
@@ -123,16 +126,50 @@ Namespace TacticaSoft
             End Try
         End Sub
 
+
+        Private Sub llenarCmbCategorias()
+
+            Dim DAO As New ProductosDAO
+            Dim listaCategorias As List(Of ProductosDTO) = DAO.Categorias()
+
+            ' Crear un elemento por defecto "Seleccionar categoría"
+            Dim categoriaDefault As New ProductosDTO()
+            categoriaDefault.categoria = "Seleccionar"
+            listaCategorias.Insert(0, categoriaDefault)
+
+            ComboBox1.DisplayMember = "Categoria"
+            ComboBox1.ValueMember = "Categoria"
+            ComboBox1.DataSource = listaCategorias
+
+        End Sub
+        Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+
+            If ComboBox1.SelectedIndex <> 0 Then
+                Dim DAO As New ProductosDAO
+                DataGridView1.DataSource = DAO.FiltrarCategoria(ComboBox1.Text)
+            End If
+            If ComboBox1.SelectedIndex = 0 Then
+                VerProductos()
+            End If
+        End Sub
+
+
+
+
+
+
         Private Sub InitializeComponent()
             Me.DataGridView1 = New System.Windows.Forms.DataGridView()
             Me.Button1 = New System.Windows.Forms.Button()
             Me.Button2 = New System.Windows.Forms.Button()
             Me.Button3 = New System.Windows.Forms.Button()
-            Me.Button4 = New System.Windows.Forms.Button()
             Me.TextBox1 = New System.Windows.Forms.TextBox()
             Me.TextBox2 = New System.Windows.Forms.TextBox()
             Me.TextBox3 = New System.Windows.Forms.TextBox()
             Me.TextBox4 = New System.Windows.Forms.TextBox()
+            Me.Label1 = New System.Windows.Forms.Label()
+            Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+            Me.Label2 = New System.Windows.Forms.Label()
             CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
@@ -150,7 +187,7 @@ Namespace TacticaSoft
             Me.Button1.Name = "Button1"
             Me.Button1.Size = New System.Drawing.Size(75, 23)
             Me.Button1.TabIndex = 1
-            Me.Button1.Text = "Button2"
+            Me.Button1.Text = "Alta"
             Me.Button1.UseVisualStyleBackColor = True
             '
             'Button2
@@ -159,7 +196,7 @@ Namespace TacticaSoft
             Me.Button2.Name = "Button2"
             Me.Button2.Size = New System.Drawing.Size(75, 23)
             Me.Button2.TabIndex = 2
-            Me.Button2.Text = "Button3"
+            Me.Button2.Text = "Baja"
             Me.Button2.UseVisualStyleBackColor = True
             '
             'Button3
@@ -168,17 +205,8 @@ Namespace TacticaSoft
             Me.Button3.Name = "Button3"
             Me.Button3.Size = New System.Drawing.Size(75, 23)
             Me.Button3.TabIndex = 3
-            Me.Button3.Text = "Button4"
+            Me.Button3.Text = "Modificacion"
             Me.Button3.UseVisualStyleBackColor = True
-            '
-            'Button4
-            '
-            Me.Button4.Location = New System.Drawing.Point(604, 210)
-            Me.Button4.Name = "Button4"
-            Me.Button4.Size = New System.Drawing.Size(75, 23)
-            Me.Button4.TabIndex = 4
-            Me.Button4.Text = "Button5"
-            Me.Button4.UseVisualStyleBackColor = True
             '
             'TextBox1
             '
@@ -203,19 +231,47 @@ Namespace TacticaSoft
             '
             'TextBox4
             '
-            Me.TextBox4.Location = New System.Drawing.Point(712, 213)
+            Me.TextBox4.Location = New System.Drawing.Point(699, 212)
             Me.TextBox4.Name = "TextBox4"
-            Me.TextBox4.Size = New System.Drawing.Size(100, 20)
+            Me.TextBox4.Size = New System.Drawing.Size(121, 20)
             Me.TextBox4.TabIndex = 8
+            '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(576, 215)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(96, 13)
+            Me.Label1.TabIndex = 9
+            Me.Label1.Text = "Buscar por nombre"
+            '
+            'ComboBox1
+            '
+            Me.ComboBox1.FormattingEnabled = True
+            Me.ComboBox1.Location = New System.Drawing.Point(699, 272)
+            Me.ComboBox1.Name = "ComboBox1"
+            Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
+            Me.ComboBox1.TabIndex = 10
+            '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(576, 275)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(97, 13)
+            Me.Label2.TabIndex = 11
+            Me.Label2.Text = "Filtrar por categoria"
             '
             'Productos
             '
             Me.ClientSize = New System.Drawing.Size(943, 378)
+            Me.Controls.Add(Me.Label2)
+            Me.Controls.Add(Me.ComboBox1)
+            Me.Controls.Add(Me.Label1)
             Me.Controls.Add(Me.TextBox4)
             Me.Controls.Add(Me.TextBox3)
             Me.Controls.Add(Me.TextBox2)
             Me.Controls.Add(Me.TextBox1)
-            Me.Controls.Add(Me.Button4)
             Me.Controls.Add(Me.Button3)
             Me.Controls.Add(Me.Button2)
             Me.Controls.Add(Me.Button1)
@@ -231,11 +287,14 @@ Namespace TacticaSoft
         Friend WithEvents Button1 As Button
         Friend WithEvents Button2 As Button
         Friend WithEvents Button3 As Button
-        Friend WithEvents Button4 As Button
         Friend WithEvents TextBox1 As TextBox
         Friend WithEvents TextBox2 As TextBox
         Friend WithEvents TextBox3 As TextBox
         Friend WithEvents TextBox4 As TextBox
+        Friend WithEvents Label1 As Label
+        Friend WithEvents ComboBox1 As ComboBox
+        Friend WithEvents Label2 As Label
+
     End Class
 End Namespace
 

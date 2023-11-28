@@ -32,7 +32,7 @@
             End Set
         End Property
 
-        Public Property fecha As String
+        Public Property total As String
             Get
                 Return _total
             End Get

@@ -168,5 +168,63 @@ Namespace TacticaSoft.DAO
         End Function
 
 
+
+        Public Function Categorias() As List(Of ProductosDTO)
+            Dim listaProducto As New List(Of ProductosDTO)()
+            Try
+                Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
+                    conexion.Open()
+
+                    Commando.Connection = conexion
+                    Commando.CommandText = "Select Distinct categoria from productos"
+                    Using reader = Commando.ExecuteReader()
+                        While reader.Read()
+                            Dim producto As New ProductosDTO()
+                            producto.categoria = reader(0).ToString()
+                            listaProducto.Add(producto)
+                        End While
+                    End Using
+                    conexion.Close()
+                End Using
+
+            Catch ex As Exception
+                Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
+            End Try
+
+            Return listaProducto
+        End Function
+
+
+        Public Function FiltrarCategoria(categoria As String) As List(Of ProductosDTO)
+            Dim listaProducto As New List(Of ProductosDTO)()
+            Try
+                Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
+                    conexion.Open()
+
+                    Commando.Connection = conexion
+                    Commando.CommandText = "Select *  from productos where categoria = @categoria"
+                    Commando.Parameters.AddWithValue("@categoria", categoria)
+                    Using reader = Commando.ExecuteReader()
+                        While reader.Read()
+                            Dim producto As New ProductosDTO()
+                            producto.ID = Convert.ToInt32(reader(0))
+                            producto.nombre = reader(1).ToString()
+                            producto.precio = reader(2).ToString()
+                            producto.categoria = reader(3).ToString()
+                            listaProducto.Add(producto)
+                        End While
+                    End Using
+                    conexion.Close()
+                End Using
+
+            Catch ex As Exception
+                Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
+            End Try
+
+            Return listaProducto
+        End Function
+
+
+
     End Class
 End Namespace

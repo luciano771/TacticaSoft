@@ -123,8 +123,8 @@ Namespace TacticaSoft
             Me.Button3 = New System.Windows.Forms.Button()
             Me.TextBox2 = New System.Windows.Forms.TextBox()
             Me.TextBox3 = New System.Windows.Forms.TextBox()
-            Me.Button4 = New System.Windows.Forms.Button()
             Me.TextBox4 = New System.Windows.Forms.TextBox()
+            Me.Label1 = New System.Windows.Forms.Label()
             CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
@@ -184,15 +184,6 @@ Namespace TacticaSoft
             Me.TextBox3.Size = New System.Drawing.Size(100, 20)
             Me.TextBox3.TabIndex = 6
             '
-            'Button4
-            '
-            Me.Button4.Location = New System.Drawing.Point(623, 175)
-            Me.Button4.Name = "Button4"
-            Me.Button4.Size = New System.Drawing.Size(75, 23)
-            Me.Button4.TabIndex = 7
-            Me.Button4.Text = "Buscar"
-            Me.Button4.UseVisualStyleBackColor = True
-            '
             'TextBox4
             '
             Me.TextBox4.Location = New System.Drawing.Point(726, 178)
@@ -200,11 +191,20 @@ Namespace TacticaSoft
             Me.TextBox4.Size = New System.Drawing.Size(100, 20)
             Me.TextBox4.TabIndex = 8
             '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(608, 181)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(96, 13)
+            Me.Label1.TabIndex = 9
+            Me.Label1.Text = "Buscar por nombre"
+            '
             'Clientes
             '
             Me.ClientSize = New System.Drawing.Size(980, 368)
+            Me.Controls.Add(Me.Label1)
             Me.Controls.Add(Me.TextBox4)
-            Me.Controls.Add(Me.Button4)
             Me.Controls.Add(Me.TextBox3)
             Me.Controls.Add(Me.TextBox2)
             Me.Controls.Add(Me.Button3)
@@ -226,9 +226,8 @@ Namespace TacticaSoft
         Friend WithEvents Button3 As Button
         Friend WithEvents TextBox2 As TextBox
         Friend WithEvents TextBox3 As TextBox
-        Friend WithEvents Button4 As Button
         Friend WithEvents TextBox4 As TextBox
-
+        Friend WithEvents Label1 As Label
 
     End Class
 End Namespace

@@ -76,6 +76,9 @@
   <ItemGroup>
     <Compile Include="DAO\Conexion.vb" />
     <Compile Include="DAO\ProductosDAO.vb" />
+    <Compile Include="DAO\VentasDAO.vb" />
+    <Compile Include="DTO\VentasDTO.vb" />
+    <Compile Include="DTO\VentasItemDTO.vb" />
     <Compile Include="View\Clientes.Designer.vb">
       <DependentUpon>Clientes.vb</DependentUpon>
     </Compile>

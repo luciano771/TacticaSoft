@@ -84,12 +84,11 @@ Namespace TacticaSoft.DAO
         End Sub
 
         Public Sub ActualizarProducto(ventas As VentasDTO)
-            Dim consulta As String = "UPDATE productos SET "
+            Dim consulta As String = "UPDATE ventas SET "
 
             Using conexion = ObtenerConexion()
                 Try
                     conexion.Open()
-
                     Using cmd As New SqlCommand(consulta, conexion)
                         Dim camposActualizados As New List(Of String)()
 

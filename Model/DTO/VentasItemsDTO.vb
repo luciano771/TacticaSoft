@@ -1,5 +1,5 @@
 ﻿Namespace TacticaSoft.DTO
-    Public Class VentasitemDTO
+    Public Class VentasitemsDTO
         Private _id As Integer
         Private _idventa As String
         Private _idproducto As String

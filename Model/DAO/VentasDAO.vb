@@ -13,14 +13,15 @@ Namespace TacticaSoft.DAO
                 Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
                     conexion.Open()
                     Commando.Connection = conexion
-                    Commando.CommandText = "Select * from ventas"
+                    Commando.CommandText = "Select c.cliente,v.fecha,v.total from ventas v,clientes c where v.IDCliente = c.ID"
                     Using reader = Commando.ExecuteReader()
                         While reader.Read()
                             Dim ventas As New VentasDTO()
-                            ventas.ID = Convert.ToInt32(reader(0))
-                            ventas.idcliente = reader(1).ToString()
-                            ventas.fecha = reader(2).ToString()
-                            ventas.total = reader(3).ToString()
+                            Dim clientes As New ClientesDTO()
+                            clientes.cliente = reader(0).ToString()
+                            ventas.clientes = clientes
+                            ventas.fecha = reader(1).ToString()
+                            ventas.total = reader(2).ToString()
                             listaventas.Add(ventas)
                         End While
                     End Using

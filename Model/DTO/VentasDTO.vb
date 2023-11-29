@@ -2,8 +2,9 @@
     Public Class VentasDTO
         Private _id As Integer
         Private _idcliente As String
-        Private _fecha As String
+        Private _fecha As DateTime
         Private _total As String
+        Private _clientes As ClientesDTO
 
         Public Property ID As Integer
             Get
@@ -40,6 +41,16 @@
                 _total = value
             End Set
         End Property
+
+        Public Property clientes As ClientesDTO
+            Get
+                Return _clientes
+            End Get
+            Set(value As ClientesDTO)
+                _clientes = value
+            End Set
+        End Property
+
 
     End Class
 

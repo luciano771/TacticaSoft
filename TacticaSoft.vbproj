@@ -77,9 +77,9 @@
     <Compile Include="Model\DAO\Conexion.vb" />
     <Compile Include="Model\DAO\ProductosDAO.vb" />
     <Compile Include="Model\DAO\VentasDAO.vb" />
-    <Compile Include="Model\DAO\VentasItem.vb" />
+    <Compile Include="Model\DAO\VentasItemsDAO.vb" />
     <Compile Include="Model\DTO\VentasDTO.vb" />
-    <Compile Include="Model\DTO\VentasItemDTO.vb" />
+    <Compile Include="Model\DTO\VentasItemsDTO.vb" />
     <Compile Include="View\Clientes.Designer.vb">
       <DependentUpon>Clientes.vb</DependentUpon>
     </Compile>
@@ -140,6 +140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\Productos.resx">
       <DependentUpon>Productos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\Ventas.resx">
+      <DependentUpon>Ventas.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

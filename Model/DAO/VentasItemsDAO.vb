@@ -13,16 +13,26 @@ Namespace TacticaSoft.DAO
                 Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
                     conexion.Open()
                     Commando.Connection = conexion
-                    Commando.CommandText = "Select * from ventasitems"
+                    Commando.CommandText = " Select 
+                                             c.cliente,
+                                             p.nombre,
+                                             v.PrecioUnitario,
+                                             v.PrecioTotal 
+                                             from ventasitems v,
+                                             clientes c,
+                                             productos p,
+                                             ventas vv
+                                             where v.IDProducto = p.ID and
+                                             vv.ID = v.IDVenta and
+                                             vv.IDCliente = c.ID"
                     Using reader = Commando.ExecuteReader()
                         While reader.Read()
+                            Dim productos As New ProductosDTO()
                             Dim ventasitems As New VentasitemsDTO()
-                            ventasitems.id = Convert.ToInt32(reader(0))
-                            ventasitems.idventa = reader(1).ToString()
-                            ventasitems.idproducto = reader(2).ToString()
-                            ventasitems.preciounitario = reader(3).ToString()
-                            ventasitems.cantidad = reader(4).ToString()
-                            ventasitems.preciototal = reader(5).ToString()
+                            productos.nombre = reader(0).ToString()
+                            ventasitems.productos = productos
+                            ventasitems.preciounitario = reader(1).ToString()
+                            ventasitems.preciototal = reader(2).ToString()
                             listaventasitems.Add(ventasitems)
                         End While
                     End Using

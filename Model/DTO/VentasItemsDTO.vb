@@ -6,7 +6,8 @@
         Private _preciounitario As String
         Private _cantidad As String
         Private _preciototal As String
-
+        Private _ventas As VentasDTO
+        Private _productos As ProductosDTO
         Public Property id As Integer
             Get
                 Return _id
@@ -61,6 +62,23 @@
             End Set
         End Property
 
+        Public Property ventas As VentasDTO
+            Get
+                Return _ventas
+            End Get
+            Set(value As VentasDTO)
+                _ventas = value
+            End Set
+        End Property
+
+        Public Property productos As ProductosDTO
+            Get
+                Return _productos
+            End Get
+            Set(value As ProductosDTO)
+                _productos = value
+            End Set
+        End Property
     End Class
 
 End Namespace

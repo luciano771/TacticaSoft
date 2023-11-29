@@ -74,11 +74,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DAO\Conexion.vb" />
-    <Compile Include="DAO\ProductosDAO.vb" />
-    <Compile Include="DAO\VentasDAO.vb" />
-    <Compile Include="DTO\VentasDTO.vb" />
-    <Compile Include="DTO\VentasItemDTO.vb" />
+    <Compile Include="Model\DAO\Conexion.vb" />
+    <Compile Include="Model\DAO\ProductosDAO.vb" />
+    <Compile Include="Model\DAO\VentasDAO.vb" />
+    <Compile Include="Model\DAO\VentasItem.vb" />
+    <Compile Include="Model\DTO\VentasDTO.vb" />
+    <Compile Include="Model\DTO\VentasItemDTO.vb" />
     <Compile Include="View\Clientes.Designer.vb">
       <DependentUpon>Clientes.vb</DependentUpon>
     </Compile>
@@ -97,7 +98,7 @@
     <Compile Include="View\Ventas.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DTO\ProductosDTO.vb" />
+    <Compile Include="Model\DTO\ProductosDTO.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -105,8 +106,8 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DAO\ClientesDAO.vb" />
-    <Compile Include="DTO\ClientesDTO.vb" />
+    <Compile Include="Model\DAO\ClientesDAO.vb" />
+    <Compile Include="Model\DTO\ClientesDTO.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

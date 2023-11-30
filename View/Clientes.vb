@@ -4,7 +4,7 @@ Imports TacticaSoft.TacticaSoft.DTO
 Namespace TacticaSoft
     Public Class Clientes
         Inherits Form
-        Private ID As String
+        Public ID As String
         Public Sub New()
             InitializeComponent()
             VerClientes()
@@ -19,6 +19,10 @@ Namespace TacticaSoft
 
         Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
             ID = DataGridView1.Rows(e.RowIndex).Cells(0).Value
+
+            If My.Forms.TacticaSoft_TacticaSof_Ventas IsNot Nothing Then
+                My.Forms.TacticaSoft_TacticaSof_Ventas.IDCliente = ID
+            End If
         End Sub
 
         Private Sub VerClientes()
@@ -228,6 +232,7 @@ Namespace TacticaSoft
         Friend WithEvents TextBox3 As TextBox
         Friend WithEvents TextBox4 As TextBox
         Friend WithEvents Label1 As Label
+
 
     End Class
 End Namespace

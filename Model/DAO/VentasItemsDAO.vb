@@ -1,6 +1,8 @@
 ﻿Imports System.Data.SqlClient
 Imports TacticaSoft.TacticaSoft.DTO
 Imports System.Data
+Imports System.Threading.Tasks
+
 Namespace TacticaSoft.DAO
     Public Class VentasItemsDAO
         Inherits Conexion
@@ -13,26 +15,34 @@ Namespace TacticaSoft.DAO
                 Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
                     conexion.Open()
                     Commando.Connection = conexion
-                    Commando.CommandText = " Select 
-                                             c.cliente,
-                                             p.nombre,
-                                             v.PrecioUnitario,
-                                             v.PrecioTotal 
-                                             from ventasitems v,
-                                             clientes c,
-                                             productos p,
-                                             ventas vv
-                                             where v.IDProducto = p.ID and
-                                             vv.ID = v.IDVenta and
-                                             vv.IDCliente = c.ID"
+                    Commando.CommandText =
+                                               "Select 
+                                                vi.ID,
+                                                V.ID AS VentaNro,
+	                                            p.nombre,
+	                                            vi.Cantidad,
+	                                            vi.PrecioUnitario,
+	                                            vi.PrecioTotal 
+                                            from 
+	                                            ventasitems vi,
+	                                            clientes c,
+	                                            productos p,
+	                                            ventas v
+                                            where 
+	                                            vi.IDProducto = p.ID and
+	                                            v.ID = vi.IDVenta and
+	                                            v.IDCliente = c.ID"
                     Using reader = Commando.ExecuteReader()
                         While reader.Read()
                             Dim productos As New ProductosDTO()
                             Dim ventasitems As New VentasitemsDTO()
-                            productos.nombre = reader(0).ToString()
+                            ventasitems.id = reader(0).ToString()
+                            ventasitems.idventa = reader(1).ToString()
+                            productos.nombre = reader(2).ToString()
                             ventasitems.productos = productos
-                            ventasitems.preciounitario = reader(1).ToString()
-                            ventasitems.preciototal = reader(2).ToString()
+                            ventasitems.cantidad = reader(3).ToString()
+                            ventasitems.preciounitario = reader(4).ToString()
+                            ventasitems.preciototal = reader(5).ToString()
                             listaventasitems.Add(ventasitems)
                         End While
                     End Using
@@ -47,19 +57,18 @@ Namespace TacticaSoft.DAO
         End Function
 
 
-        Public Sub InsertarProducto(ventas As VentasDTO)
+        Public Sub InsertarVentasItems(ventasItems As VentasitemsDTO)
             Dim consulta As String = "INSERT INTO ventasitems (IDVenta, IDProducto, PrecioUnitario, Cantidad, PrecioTotal) VALUES (@idventa, @idproducto, @preciounitario,@cantidad,@preciototal)"
-
             Using conexion = ObtenerConexion()
                 Try
                     conexion.Open()
 
                     Using cmd As New SqlCommand(consulta, conexion)
-                        cmd.Parameters.AddWithValue("@idventa", ventas.idcliente)
-                        cmd.Parameters.AddWithValue("@idproducto", ventas.fecha)
-                        cmd.Parameters.AddWithValue("@preciounitario", ventas.fecha)
-                        cmd.Parameters.AddWithValue("@cantidad", ventas.fecha)
-                        cmd.Parameters.AddWithValue("@preciototal", ventas.fecha)
+                        cmd.Parameters.AddWithValue("@idventa", ventasItems.idventa)
+                        cmd.Parameters.AddWithValue("@idproducto", ventasItems.idproducto)
+                        cmd.Parameters.AddWithValue("@preciounitario", ventasItems.preciounitario)
+                        cmd.Parameters.AddWithValue("@cantidad", ventasItems.cantidad)
+                        cmd.Parameters.AddWithValue("@preciototal", ventasItems.preciototal)
                         cmd.ExecuteNonQuery()
                     End Using
 
@@ -74,7 +83,7 @@ Namespace TacticaSoft.DAO
             End Using
         End Sub
 
-        Public Sub EliminarProducto(ID As Integer)
+        Public Async Function EliminarItemVenta(ID As Integer) As Task
             Dim consulta As String = "DELETE from ventasitems where id = @id"
 
             Using conexion = ObtenerConexion()
@@ -83,7 +92,7 @@ Namespace TacticaSoft.DAO
 
                     Using cmd As New SqlCommand(consulta, conexion)
                         cmd.Parameters.AddWithValue("@id", ID)
-                        cmd.ExecuteNonQuery()
+                        Await cmd.ExecuteNonQueryAsync()
                     End Using
 
                 Catch ex As Exception
@@ -95,7 +104,8 @@ Namespace TacticaSoft.DAO
                     End If
                 End Try
             End Using
-        End Sub
+        End Function
+
 
         Public Sub ActualizarProducto(ventasitems As VentasitemsDTO)
             Dim consulta As String = "UPDATE ventas SET "
@@ -150,6 +160,30 @@ Namespace TacticaSoft.DAO
         End Sub
 
 
+        Public Function BuscarPorId(id As Integer) As List(Of VentasitemsDTO)
+            Dim listaventasitems As New List(Of VentasitemsDTO)()
+            Try
+                Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
+                    conexion.Open()
+                    Commando.Connection = conexion
+                    Commando.CommandText = "select * from ventasitems WHERE id = @id"
+                    Commando.Parameters.AddWithValue("@id", id)
+                    Using reader = Commando.ExecuteReader()
+                        While reader.Read()
+                            Dim ventasitems As New VentasitemsDTO()
+                            ventasitems.id = reader(0).ToString()
+                            listaventasitems.Add(ventasitems)
+                        End While
+                    End Using
+                    conexion.Close()
+                End Using
+
+            Catch ex As Exception
+                Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
+            End Try
+
+            Return listaventasitems
+        End Function
 
 
 

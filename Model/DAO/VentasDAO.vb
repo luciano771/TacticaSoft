@@ -1,6 +1,8 @@
 ﻿Imports System.Data.SqlClient
 Imports TacticaSoft.TacticaSoft.DTO
 Imports System.Data
+Imports System.Threading.Tasks
+
 Namespace TacticaSoft.DAO
     Public Class VentasDAO
         Inherits Conexion
@@ -13,15 +15,16 @@ Namespace TacticaSoft.DAO
                 Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
                     conexion.Open()
                     Commando.Connection = conexion
-                    Commando.CommandText = "Select c.cliente,v.fecha,v.total from ventas v,clientes c where v.IDCliente = c.ID"
+                    Commando.CommandText = "Select v.ID,c.cliente,v.fecha,v.total from ventas v,clientes c where v.IDCliente = c.ID"
                     Using reader = Commando.ExecuteReader()
                         While reader.Read()
                             Dim ventas As New VentasDTO()
                             Dim clientes As New ClientesDTO()
-                            clientes.cliente = reader(0).ToString()
+                            ventas.ID = reader(0).ToString()
+                            clientes.cliente = reader(1).ToString()
                             ventas.clientes = clientes
-                            ventas.fecha = reader(1).ToString()
-                            ventas.total = reader(2).ToString()
+                            ventas.fecha = reader(2).ToString()
+                            ventas.total = reader(3).ToString()
                             listaventas.Add(ventas)
                         End While
                     End Using
@@ -36,8 +39,10 @@ Namespace TacticaSoft.DAO
         End Function
 
 
-        Public Sub InsertarProducto(ventas As VentasDTO)
-            Dim consulta As String = "INSERT INTO ventas (IDCliente, Fecha, Total) VALUES (@idcliente, @fecha, @total)"
+        Public Function InsertarVenta(ventas As VentasDTO) As Integer
+            Dim idVentaInsertada As Integer = 0
+
+            Dim consulta As String = "INSERT INTO ventas (IDCliente, Fecha, Total) OUTPUT INSERTED.ID VALUES (@idcliente, @fecha, @total)"
 
             Using conexion = ObtenerConexion()
                 Try
@@ -47,7 +52,7 @@ Namespace TacticaSoft.DAO
                         cmd.Parameters.AddWithValue("@idcliente", ventas.idcliente)
                         cmd.Parameters.AddWithValue("@fecha", ventas.fecha)
                         cmd.Parameters.AddWithValue("@total", ventas.total)
-                        cmd.ExecuteNonQuery()
+                        idVentaInsertada = Convert.ToInt32(cmd.ExecuteScalar())
                     End Using
 
                 Catch ex As Exception
@@ -59,30 +64,41 @@ Namespace TacticaSoft.DAO
                     End If
                 End Try
             End Using
-        End Sub
 
-        Public Sub EliminarProducto(ID As Integer)
-            Dim consulta As String = "DELETE from ventas where id = @id"
+            Return idVentaInsertada
+        End Function
 
-            Using conexion = ObtenerConexion()
-                Try
-                    conexion.Open()
 
-                    Using cmd As New SqlCommand(consulta, conexion)
-                        cmd.Parameters.AddWithValue("@id", ID)
-                        cmd.ExecuteNonQuery()
-                    End Using
 
-                Catch ex As Exception
-                    Console.WriteLine("Error al borrar datos en la base de datos: " & ex.Message)
 
-                Finally
-                    If conexion.State = ConnectionState.Open Then
-                        conexion.Close()
-                    End If
-                End Try
-            End Using
-        End Sub
+        Public Async Function EliminarVenta(ID As Integer) As Task
+
+            Dim ventasitemsDAO As New VentasItemsDAO()
+            Dim ListaItems = ventasitemsDAO.BuscarPorId(ID)
+
+            If ListaItems.Count = 0 Then
+                Dim consulta As String = "DELETE from ventas where id = @id"
+
+                Using conexion = ObtenerConexion()
+                    Try
+                        conexion.Open()
+
+                        Using cmd As New SqlCommand(consulta, conexion)
+                            cmd.Parameters.AddWithValue("@id", ID)
+                            Await cmd.ExecuteNonQueryAsync()
+                        End Using
+
+                    Catch ex As Exception
+                        Console.WriteLine("Error al borrar datos en la base de datos: " & ex.Message)
+
+                    Finally
+                        If conexion.State = ConnectionState.Open Then
+                            conexion.Close()
+                        End If
+                    End Try
+                End Using
+            End If
+        End Function
 
         Public Sub ActualizarProducto(ventas As VentasDTO)
             Dim consulta As String = "UPDATE ventas SET "

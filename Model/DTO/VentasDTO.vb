@@ -24,11 +24,11 @@
             End Set
         End Property
 
-        Public Property fecha As String
+        Public Property fecha As DateTime
             Get
                 Return _fecha
             End Get
-            Set(value As String)
+            Set(value As DateTime)
                 _fecha = value
             End Set
         End Property

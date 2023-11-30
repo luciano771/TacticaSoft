@@ -3,6 +3,7 @@ Imports TacticaSoft.TacticaSoft.DTO
 
 
 
+
 Namespace TacticaSoft
     Public Class Form1
         Inherits Form
@@ -65,16 +66,17 @@ Namespace TacticaSoft
 
 
         Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-            Clientes.Show()
+            My.Forms.TacticaSoft_TacticaSoft_Clientes.Show()
         End Sub
         Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-            Productos.Show() 
+            My.Forms.TacticaSoft_TacticaSoft_Productos.Show()
         End Sub
 
         Friend WithEvents Button3 As Button
 
         Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-            Ventas.Show()
+            My.Forms.TacticaSoft_TacticaSof_Ventas.Show()
+
         End Sub
     End Class
 End Namespace

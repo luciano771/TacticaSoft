@@ -41,10 +41,13 @@ Namespace TacticaSoft
                 Next
 
 
+                If Not Form1.ventasForm Is Nothing Then
 
-                If Form1.ventasForm.Visible Then
-                    Form1.ventasForm.ComboBox1.DataSource = items
-                    Form1.ventasForm.ComboBox1.Refresh()
+
+                    If Form1.ventasForm.Visible Then
+                        Form1.ventasForm.ComboBox1.DataSource = items
+                        Form1.ventasForm.ComboBox1.Refresh()
+                    End If
                 End If
             End If
 

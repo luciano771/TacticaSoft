@@ -32,11 +32,12 @@ Namespace TacticaSoft
 
                 ID = DataGridView1.Rows(e.RowIndex).Cells(0).Value
                 Funciones.FuncVentas.idcliente = ID
-
-                If Form1.ventasForm.Visible Then
-                    Form1.ventasForm.TextBox1.Text = DataGridView1.Rows(e.RowIndex).Cells(1).Value
-                    Form1.ventasForm.TextBox1.Refresh()
-                    Me.Hide()
+                If Not Form1.ventasForm Is Nothing Then
+                    If Form1.ventasForm.Visible Then
+                        Form1.ventasForm.TextBox1.Text = DataGridView1.Rows(e.RowIndex).Cells(1).Value
+                        Form1.ventasForm.TextBox1.Refresh()
+                        Me.Hide()
+                    End If
                 End If
             End If
 

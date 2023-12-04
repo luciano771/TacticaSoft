@@ -74,7 +74,8 @@ Namespace TacticaSoft.DAO
         Public Async Function EliminarVenta(ID As Integer) As Task
 
             Dim ventasitemsDAO As New VentasItemsDAO()
-            Dim ListaItems = ventasitemsDAO.BuscarPorId(ID)
+
+            Dim ListaItems = Await ventasitemsDAO.BuscarPorId(ID)
 
             If ListaItems.Count = 0 Then
                 Dim consulta As String = "DELETE from ventas where id = @id"
@@ -100,7 +101,7 @@ Namespace TacticaSoft.DAO
             End If
         End Function
 
-        Public Sub ActualizarProducto(ventas As VentasDTO)
+        Public Async Function ActualizarProducto(ventas As VentasDTO) As Task
             Dim consulta As String = "UPDATE ventas SET "
 
             Using conexion = ObtenerConexion()
@@ -109,17 +110,12 @@ Namespace TacticaSoft.DAO
                     Using cmd As New SqlCommand(consulta, conexion)
                         Dim camposActualizados As New List(Of String)()
 
-                        If Not String.IsNullOrEmpty(ventas.idcliente) Or ventas.idcliente <> "" Then
+                        If Not String.IsNullOrEmpty(ventas.idcliente) AndAlso ventas.idcliente <> "" Then
                             camposActualizados.Add("IDCliente = @idcliente")
                             cmd.Parameters.AddWithValue("@idcliente", ventas.idcliente)
                         End If
 
-                        If Not String.IsNullOrEmpty(ventas.fecha) Or ventas.fecha <> "" AndAlso Single.TryParse(ventas.fecha, Nothing) Then
-                            camposActualizados.Add("Fecha = @fecha")
-                            cmd.Parameters.Add("@fecha", SqlDbType.Float).Value = Single.Parse(ventas.fecha)
-                        End If
-
-                        If Not String.IsNullOrEmpty(ventas.total) Or ventas.total <> "" Then
+                        If Not String.IsNullOrEmpty(ventas.total) AndAlso ventas.total <> "" Then
                             camposActualizados.Add("Total = @total")
                             cmd.Parameters.AddWithValue("@total", ventas.total)
                         End If
@@ -130,7 +126,7 @@ Namespace TacticaSoft.DAO
                         cmd.Parameters.AddWithValue("@id", ventas.ID)
                         cmd.CommandText = consulta
 
-                        cmd.ExecuteNonQuery()
+                        Await cmd.ExecuteNonQueryAsync()
                     End Using
 
                 Catch ex As Exception
@@ -142,7 +138,8 @@ Namespace TacticaSoft.DAO
                     End If
                 End Try
             End Using
-        End Sub
+        End Function
+
 
         Public Function Buscar(nombre As String) As List(Of ProductosDTO)
             Dim listaProducto As New List(Of ProductosDTO)()
@@ -164,6 +161,41 @@ Namespace TacticaSoft.DAO
                                 producto.precio = reader(2).ToString()
                                 producto.categoria = reader(3).ToString()
                                 listaProducto.Add(producto)
+                            End While
+                        End Using
+                    End Using
+
+                    conexion.Close()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
+            End Try
+
+            Return listaProducto
+        End Function
+
+        Public Async Function BuscarPorId(id As Integer) As Task(Of List(Of VentasDTO))
+            Dim listaProducto As New List(Of VentasDTO)()
+
+            Try
+                Dim consulta As String = "SELECT * FROM ventas WHERE ID = @id"
+
+                Using conexion = ObtenerConexion()
+                    conexion.Open()
+
+                    Using Commando As New SqlCommand(consulta, conexion)
+                        Commando.Parameters.AddWithValue("@id", id)
+
+                        Using reader = Await Commando.ExecuteReaderAsync()
+                            While reader.Read()
+                                Dim ventas As New VentasDTO()
+                                Dim clientes As New ClientesDTO()
+                                ventas.ID = reader(0).ToString()
+                                clientes.cliente = reader(1).ToString()
+                                ventas.clientes = clientes
+                                ventas.fecha = reader(2).ToString()
+                                ventas.total = reader(3).ToString()
+                                listaProducto.Add(ventas)
                             End While
                         End Using
                     End Using

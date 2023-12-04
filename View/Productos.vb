@@ -7,15 +7,17 @@ Namespace TacticaSoft
         Inherits Form
 
 
-        Private ID_Producto As Integer
-        Private dt As DataTable
-
+        Public ID_Producto As Integer
+        Public dt As DataTable
+        Public FuncionesProductos As New TacticaSoft.Funciones.FuncProductos()
+        Public FuncionesVentas As New TacticaSoft.Funciones.FuncVentas()
 
 
         Public Sub New()
             InitializeComponent()
-            VerProductos()
+            FuncionesProductos.VerProductos(DataGridView1)
             llenarCmbCategorias()
+            DataGridView2.Visible = False
         End Sub
 
 
@@ -24,53 +26,26 @@ Namespace TacticaSoft
             Dim Precio = DataGridView1.Rows(e.RowIndex).Cells(2).Value
             Dim Nombre = DataGridView1.Rows(e.RowIndex).Cells(1).Value
 
-            If dt Is Nothing Then
-                dt = New DataTable()
-                dt.Columns.Add("ID")
-                dt.Columns.Add("Nombre")
-                dt.Columns.Add("Cantidad")
-                dt.Columns.Add("Precio")
-            End If
-
-
-            Dim found As Boolean = False
-
-            For Each row As DataRow In dt.Rows
-                If Convert.ToInt32(row("ID")) = ID_Producto Then
-                    row("Cantidad") = Convert.ToInt32(row("Cantidad")) + 1
-                    row("Precio") = Convert.ToInt32(row("Cantidad")) * Convert.ToDecimal(row("Precio"))
-                    found = True
-                    Exit For
-                End If
-            Next
-
-            If Not found Then
-                Dim newRow As DataRow = dt.NewRow()
-                newRow("ID") = ID_Producto
-                newRow("Cantidad") = 1
-                newRow("Nombre") = Nombre
-                newRow("Precio") = Precio
-                dt.Rows.Add(newRow)
-            End If
-
+            dt = FuncionesProductos.GrillaSeleccionarProductos(dt, ID_Producto, Nombre, Precio)
             DataGridView2.AllowUserToAddRows = False
             DataGridView2.DataSource = dt
+            Funciones.FuncVentas.dtProductos = dt
 
-            If My.Forms.TacticaSoft_TacticaSof_Ventas IsNot Nothing Then
-                My.Forms.TacticaSoft_TacticaSof_Ventas.dt = dt
+            Dim items As New List(Of String)()
+
+            For Each row As DataRow In dt.Rows
+                Dim nombreCantidad As String = $"{row("Nombre")} - {row("Cantidad")}"
+                items.Add(nombreCantidad)
+            Next
+
+
+
+            If Not Form1.ventasForm Is Nothing Then
+                Form1.ventasForm.ComboBox1.DataSource = items
+                Form1.ventasForm.ComboBox1.Refresh()
             End If
-
         End Sub
 
-        Private Sub VerProductos()
-            Try
-                Dim DAO As New ProductosDAO()
-                DataGridView1.DataSource = DAO.Read()
-            Catch ex As Exception
-                ' Manejar la excepción aquí (puedes registrarla, mostrar un mensaje, etc.)
-                Console.WriteLine("Error al obtener registros: " & ex.Message)
-            End Try
-        End Sub
 
 
         Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -82,21 +57,14 @@ Namespace TacticaSoft
 
         Private Sub AgregarProducto()
             If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
-                MsgBox("Debe completar los 3 campos")
+                MsgBox("Debe completar todos los campos")
                 Return
             End If
 
-            Try
-                Dim DAO As New ProductosDAO()
-                Dim DTO As New ProductosDTO()
-                DTO.nombre = TextBox1.Text
-                DTO.precio = TextBox2.Text
-                DTO.categoria = TextBox3.Text
-                DAO.InsertarProducto(DTO)
-                VerProductos()
-            Catch ex As Exception
-                Console.WriteLine("Error al insertar registros: " & ex.Message)
-            End Try
+            FuncionesProductos.AgregarProducto(DataGridView1, TextBox1.Text, TextBox2.Text, TextBox3.Text)
+            FuncionesProductos.VerProductos(DataGridView1)
+
+
         End Sub
 
 
@@ -104,7 +72,7 @@ Namespace TacticaSoft
 
             If ID_Producto <> vbEmpty Then
                 EliminarProductoPorID(ID_Producto)
-                VerProductos()
+                FuncionesProductos.VerProductos(DataGridView1)
                 llenarCmbCategorias()
             Else
                 MsgBox("Debe Seleccionar un registro")
@@ -118,52 +86,41 @@ Namespace TacticaSoft
 
 
         Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-            If ID_Producto <> vbEmpty Then
-                ModificarProducto()
-                VerProductos()
+            If ID_Producto <> Nothing Then
+                FuncionesProductos.ModificarProducto(ID_Producto, TextBox1.Text, TextBox2.Text, TextBox3.Text)
+                FuncionesProductos.VerProductos(DataGridView1)
                 llenarCmbCategorias()
             Else
                 MsgBox("Debe Seleccionar un registro")
             End If
         End Sub
 
-        Private Sub ModificarProducto()
-
-            Try
-                Dim DAO As New ProductosDAO()
-                Dim DTO As New ProductosDTO()
-                DTO.ID = ID_Producto
-                DTO.nombre = TextBox1.Text
-                DTO.precio = TextBox2.Text
-                DTO.categoria = TextBox3.Text
-                DAO.ActualizarProducto(DTO)
-            Catch ex As Exception
-                Console.WriteLine("Error al insertar registros: " & ex.Message)
-            End Try
-        End Sub
 
 
 
 
         Private Sub TextBox4_TextChanged(sender As Object, e As EventArgs) Handles TextBox4.TextChanged
-            BuscarProducto(TextBox4.Text)
+            If TextBox4.Text <> "" Then
+                Dim dt1 As New DataTable
+                dt1 = DataGridView1.DataSource
+                Dim vista As New DataView(dt1)
+                vista.RowFilter = $"CONVERT({"Nombre"}, 'System.String') LIKE '%{TextBox4.Text}%'"
+                DataGridView1.DataSource = vista.ToTable()
+            Else
+                FuncionesProductos.VerProductos(DataGridView1)
+
+            End If
         End Sub
 
-        Private Sub BuscarProducto(nombre As String)
+        Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 
-            If TextBox4.Text.Trim() = "" Then
-                VerProductos()
-                Return
+            If ComboBox1.SelectedIndex <> 0 Then
+                Dim DAO As New ProductosDAO
+                DataGridView1.DataSource = DAO.FiltrarCategoria(ComboBox1.Text)
             End If
-
-            Try
-                Dim DAO As New ProductosDAO()
-
-                DataGridView1.DataSource = DAO.Buscar(nombre)
-
-            Catch ex As Exception
-                Console.WriteLine("Error al obtener los registros: " & ex.Message)
-            End Try
+            If ComboBox1.SelectedIndex = 0 Then
+                FuncionesProductos.VerProductos(DataGridView1)
+            End If
         End Sub
 
 
@@ -172,7 +129,6 @@ Namespace TacticaSoft
             Dim DAO As New ProductosDAO
             Dim listaCategorias As List(Of ProductosDTO) = DAO.Categorias()
 
-            ' Crear un elemento por defecto "Seleccionar categoría"
             Dim categoriaDefault As New ProductosDTO()
             categoriaDefault.categoria = "Seleccionar"
             listaCategorias.Insert(0, categoriaDefault)
@@ -182,16 +138,24 @@ Namespace TacticaSoft
             ComboBox1.DataSource = listaCategorias
 
         End Sub
-        Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 
-            If ComboBox1.SelectedIndex <> 0 Then
-                Dim DAO As New ProductosDAO
-                DataGridView1.DataSource = DAO.FiltrarCategoria(ComboBox1.Text)
-            End If
-            If ComboBox1.SelectedIndex = 0 Then
-                VerProductos()
-            End If
-        End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

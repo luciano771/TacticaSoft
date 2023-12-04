@@ -90,7 +90,7 @@ Namespace TacticaSoft.DAO
             End Using
         End Sub
 
-        Public Sub ActualizarCliente(cliente As ClientesDTO)
+        Public Async Function ActualizarCliente(cliente As ClientesDTO) As Task
             Dim consulta As String = "UPDATE clientes SET "
 
             Using conexion = ObtenerConexion()
@@ -121,7 +121,7 @@ Namespace TacticaSoft.DAO
                         cmd.Parameters.AddWithValue("@id", cliente.ID)
                         cmd.CommandText = consulta
 
-                        cmd.ExecuteNonQuery()
+                        Await cmd.ExecuteNonQueryAsync()
                     End Using
 
                 Catch ex As Exception
@@ -133,7 +133,7 @@ Namespace TacticaSoft.DAO
                     End If
                 End Try
             End Using
-        End Sub
+        End Function
 
         Public Function Buscar(clientes As String) As List(Of ClientesDTO)
             Dim listaClientes As New List(Of ClientesDTO)()

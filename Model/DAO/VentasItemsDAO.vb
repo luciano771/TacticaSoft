@@ -19,6 +19,7 @@ Namespace TacticaSoft.DAO
                                                "Select 
                                                 vi.ID,
                                                 V.ID AS VentaNro,
+                                                vi.IDProducto,
 	                                            p.nombre,
 	                                            vi.Cantidad,
 	                                            vi.PrecioUnitario,
@@ -38,11 +39,12 @@ Namespace TacticaSoft.DAO
                             Dim ventasitems As New VentasitemsDTO()
                             ventasitems.id = reader(0).ToString()
                             ventasitems.idventa = reader(1).ToString()
-                            productos.nombre = reader(2).ToString()
+                            productos.ID = reader(2).ToString()
+                            productos.nombre = reader(3).ToString()
                             ventasitems.productos = productos
-                            ventasitems.cantidad = reader(3).ToString()
-                            ventasitems.preciounitario = reader(4).ToString()
-                            ventasitems.preciototal = reader(5).ToString()
+                            ventasitems.cantidad = reader(4).ToString()
+                            ventasitems.preciounitario = reader(5).ToString()
+                            ventasitems.preciototal = reader(6).ToString()
                             listaventasitems.Add(ventasitems)
                         End While
                     End Using
@@ -107,46 +109,40 @@ Namespace TacticaSoft.DAO
         End Function
 
 
-        Public Sub ActualizarProducto(ventasitems As VentasitemsDTO)
-            Dim consulta As String = "UPDATE ventas SET "
+
+        Public Async Function ActualizarProducto(ventasitems As VentasitemsDTO) As Task
+
+            ventasitems.preciototal = ventasitems.cantidad * ventasitems.preciounitario
 
             Using conexion = ObtenerConexion()
                 Try
                     conexion.Open()
-                    Using cmd As New SqlCommand(consulta, conexion)
-                        Dim camposActualizados As New List(Of String)()
 
-                        If Not String.IsNullOrEmpty(ventasitems.idventa) Or ventasitems.idventa <> "" Then
-                            camposActualizados.Add("IDVenta = @idventa")
-                            cmd.Parameters.AddWithValue("@idcliente", ventasitems.idventa)
-                        End If
+                    Dim consulta As String = "UPDATE ventasitems SET "
+                    Dim camposActualizados As New List(Of String)()
 
-                        If Not String.IsNullOrEmpty(ventasitems.idproducto) Or ventasitems.idproducto <> "" AndAlso Single.TryParse(ventasitems.idproducto, Nothing) Then
-                            camposActualizados.Add("IDProducto = @idproducto")
-                            cmd.Parameters.Add("@fecha", SqlDbType.Float).Value = Single.Parse(ventasitems.idproducto)
-                        End If
+                    If Not String.IsNullOrEmpty(ventasitems.cantidad) AndAlso ventasitems.cantidad <> "" Then
+                        camposActualizados.Add("Cantidad = @cantidad")
+                        camposActualizados.Add("PrecioTotal = @preciototal")
+                    End If
 
-                        If Not String.IsNullOrEmpty(ventasitems.preciounitario) Or ventasitems.preciounitario <> "" Then
-                            camposActualizados.Add("PrecioUnitario = @preciounitario")
-                            cmd.Parameters.AddWithValue("@preciounitario", ventasitems.preciounitario)
-                        End If
-                        If Not String.IsNullOrEmpty(ventasitems.cantidad) Or ventasitems.cantidad <> "" Then
-                            camposActualizados.Add("Cantidad = @cantidad")
-                            cmd.Parameters.AddWithValue("@cantidad", ventasitems.cantidad)
-                        End If
-                        If Not String.IsNullOrEmpty(ventasitems.preciototal) Or ventasitems.preciototal <> "" Then
-                            camposActualizados.Add("PrecioTotal = @preciototal")
-                            cmd.Parameters.AddWithValue("@preciototal", ventasitems.preciototal)
-                        End If
-
+                    ' Verifica si hay campos actualizados
+                    If camposActualizados.Count > 0 Then
                         consulta += String.Join(", ", camposActualizados)
-                        consulta += " WHERE ID = @id"
+                        consulta += " WHERE id = @id"
 
-                        cmd.Parameters.AddWithValue("@id", ventasitems.id)
-                        cmd.CommandText = consulta
+                        Using cmd As New SqlCommand(consulta, conexion)
+                            cmd.Parameters.AddWithValue("@id", ventasitems.id)
+                            If Not String.IsNullOrEmpty(ventasitems.cantidad) AndAlso ventasitems.cantidad <> "" Then
+                                cmd.Parameters.AddWithValue("@cantidad", ventasitems.cantidad)
+                                cmd.Parameters.AddWithValue("@preciototal", ventasitems.preciototal)
+                            End If
 
-                        cmd.ExecuteNonQuery()
-                    End Using
+                            Await cmd.ExecuteNonQueryAsync()
+                        End Using
+                    Else
+                        Console.WriteLine("No se proporcionaron campos para actualizar.")
+                    End If
 
                 Catch ex As Exception
                     Console.WriteLine("Error al actualizar datos en la base de datos: " & ex.Message)
@@ -157,33 +153,123 @@ Namespace TacticaSoft.DAO
                     End If
                 End Try
             End Using
-        End Sub
+        End Function
 
 
-        Public Function BuscarPorId(id As Integer) As List(Of VentasitemsDTO)
+
+        Public Async Function BuscarPorId(id As Integer) As Task(Of List(Of VentasitemsDTO))
             Dim listaventasitems As New List(Of VentasitemsDTO)()
+
             Try
-                Using conexion = ObtenerConexion() ' Obtener la conexión de la clase base
+                Using conexion = ObtenerConexion()
                     conexion.Open()
-                    Commando.Connection = conexion
-                    Commando.CommandText = "select * from ventasitems WHERE id = @id"
-                    Commando.Parameters.AddWithValue("@id", id)
-                    Using reader = Commando.ExecuteReader()
-                        While reader.Read()
-                            Dim ventasitems As New VentasitemsDTO()
-                            ventasitems.id = reader(0).ToString()
-                            listaventasitems.Add(ventasitems)
-                        End While
+                    Dim consulta As String = "SELECT 
+                                        vi.ID,
+                                        V.ID AS VentaNro,
+                                        vi.IDProducto,
+	                                    p.nombre,
+	                                    vi.Cantidad,
+	                                    vi.PrecioUnitario,
+	                                    vi.PrecioTotal 
+                                    FROM 
+	                                    ventasitems vi,
+	                                    clientes c,
+	                                    productos p,
+	                                    ventas v
+                                    WHERE 
+	                                    vi.IDProducto = p.ID AND
+	                                    v.ID = vi.IDVenta AND
+	                                    v.IDCliente = c.ID AND
+                                        vi.ID = @idventa"
+
+                    Using commando As New SqlCommand(consulta, conexion)
+                        commando.Parameters.AddWithValue("@idventa", id)
+
+                        Using reader = Await commando.ExecuteReaderAsync()
+                            While reader.Read()
+                                Dim Ventasitems As New VentasitemsDTO()
+                                Dim productos As New ProductosDTO()
+
+                                Ventasitems.id = reader(0).ToString()
+                                Ventasitems.idventa = reader(1).ToString()
+                                productos.ID = reader(2).ToString()
+                                productos.nombre = reader(3).ToString()
+                                Ventasitems.productos = productos
+                                Ventasitems.cantidad = reader(4).ToString()
+                                Ventasitems.preciounitario = reader(5).ToString()
+                                Ventasitems.preciototal = reader(6).ToString()
+
+                                listaventasitems.Add(Ventasitems)
+                            End While
+                        End Using
                     End Using
+
                     conexion.Close()
                 End Using
-
             Catch ex As Exception
                 Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
             End Try
 
             Return listaventasitems
         End Function
+
+
+        Public Async Function BuscarPorIdVenta(id As Integer) As Task(Of List(Of VentasitemsDTO))
+            Dim listaventasitems As New List(Of VentasitemsDTO)()
+
+            Try
+                Using conexion = ObtenerConexion()
+                    conexion.Open()
+                    Dim consulta As String = "SELECT 
+                                        vi.ID,
+                                        V.ID AS VentaNro,
+                                        vi.IDProducto,
+	                                    p.nombre,
+	                                    vi.Cantidad,
+	                                    vi.PrecioUnitario,
+	                                    vi.PrecioTotal 
+                                    FROM 
+	                                    ventasitems vi,
+	                                    clientes c,
+	                                    productos p,
+	                                    ventas v
+                                    WHERE 
+	                                    vi.IDProducto = p.ID AND
+	                                    v.ID = vi.IDVenta AND
+	                                    v.IDCliente = c.ID AND
+                                        vi.IDVenta = @idventa"
+
+                    Using commando As New SqlCommand(consulta, conexion)
+                        commando.Parameters.AddWithValue("@idventa", id)
+
+                        Using reader = Await commando.ExecuteReaderAsync()
+                            While reader.Read()
+                                Dim Ventasitems As New VentasitemsDTO()
+                                Dim productos As New ProductosDTO()
+
+                                Ventasitems.id = reader(0).ToString()
+                                Ventasitems.idventa = reader(1).ToString()
+                                productos.ID = reader(2).ToString()
+                                productos.nombre = reader(3).ToString()
+                                Ventasitems.productos = productos
+                                Ventasitems.cantidad = reader(4).ToString()
+                                Ventasitems.preciounitario = reader(5).ToString()
+                                Ventasitems.preciototal = reader(6).ToString()
+
+                                listaventasitems.Add(Ventasitems)
+                            End While
+                        End Using
+                    End Using
+
+                    conexion.Close()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine("Error al obtener datos de la base de datos: " & ex.Message)
+            End Try
+
+            Return listaventasitems
+        End Function
+
 
 
 

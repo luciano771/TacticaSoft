@@ -5,6 +5,7 @@
         Private _cliente As String
         Private _telefono As String
         Private _correo As String
+        Public Shared InstanciaActual As Clientes
 
         Public Property ID As Integer
             Get

@@ -4,11 +4,21 @@ Imports TacticaSoft.TacticaSoft.DTO
 Namespace TacticaSoft
     Public Class Clientes
         Inherits Form
+
         Public ID As String
+        Public FuncionesClientes As New TacticaSoft.Funciones.FuncCliente()
+
+
+
+
+
+
+
         Public Sub New()
             InitializeComponent()
-            VerClientes()
+            FuncionesClientes.verClientes(DataGridView1)
         End Sub
+
 
 
 
@@ -19,21 +29,18 @@ Namespace TacticaSoft
 
         Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
             ID = DataGridView1.Rows(e.RowIndex).Cells(0).Value
+            Funciones.FuncVentas.idcliente = ID
 
-            If My.Forms.TacticaSoft_TacticaSof_Ventas IsNot Nothing Then
-                My.Forms.TacticaSoft_TacticaSof_Ventas.IDCliente = ID
-            End If
+
+            Form1.ventasForm.TextBox1.Text = DataGridView1.Rows(e.RowIndex).Cells(1).Value
+            Form1.ventasForm.TextBox1.Refresh()
+
+            Me.Hide()
+
+
         End Sub
 
-        Private Sub VerClientes()
-            Try
-                Dim DAO As New ClientesDAO()
-                DataGridView1.DataSource = DAO.Read()
-            Catch ex As Exception
-                ' Manejar la excepción aquí (puedes registrarla, mostrar un mensaje, etc.)
-                Console.WriteLine("Error al obtener registros: " & ex.Message)
-            End Try
-        End Sub
+
 
         Private Sub AgregarCliente()
             If TextBox1.Text = "" Or TextBox2.Text = "" Or TextBox3.Text = "" Then
@@ -41,19 +48,9 @@ Namespace TacticaSoft
                 Return
             End If
 
+            FuncionesClientes.InsertarCliente(TextBox1.Text, TextBox2.Text, TextBox3.Text)
+            FuncionesClientes.verClientes(DataGridView1)
 
-
-            Try
-                Dim DAO As New ClientesDAO()
-                Dim DTO As New ClientesDTO()
-                DTO.cliente = TextBox1.Text
-                DTO.telefono = TextBox2.Text
-                DTO.correo = TextBox3.Text
-                DAO.InsertarCliente(DTO)
-                VerClientes()
-            Catch ex As Exception
-                Console.WriteLine("Error al insertar registros: " & ex.Message)
-            End Try
         End Sub
 
         Public Sub EliminarClientePorID(idCliente As Integer)
@@ -62,29 +59,15 @@ Namespace TacticaSoft
         End Sub
 
 
-        Private Sub ModificarCliente()
 
-            Try
-                Dim DAO As New ClientesDAO()
-                Dim DTO As New ClientesDTO()
-                DTO.ID = ID
-                DTO.cliente = TextBox1.Text
-                DTO.telefono = TextBox2.Text
-                DTO.correo = TextBox3.Text
-                DAO.ActualizarCliente(DTO)
-                VerClientes()
-            Catch ex As Exception
-                Console.WriteLine("Error al insertar registros: " & ex.Message)
-            End Try
-        End Sub
 
 
 
 
         Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-            If ID <> vbEmpty Then
+            If ID <> Nothing Then
                 EliminarClientePorID(ID)
-                VerClientes()
+                FuncionesClientes.verClientes(DataGridView1)
             Else
                 MsgBox("Debe Seleccionar un registro")
             End If
@@ -92,7 +75,7 @@ Namespace TacticaSoft
         End Sub
 
         Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-            ModificarCliente()
+            FuncionesClientes.actualizarClientes(ID, TextBox1.Text, TextBox2.Text, TextBox3.Text)
         End Sub
 
 
@@ -103,18 +86,19 @@ Namespace TacticaSoft
         Private Sub BuscarProducto(nombre As String)
 
             If TextBox4.Text.Trim() = "" Then
-                VerClientes()
+                FuncionesClientes.verClientes(DataGridView1)
                 Return
             End If
 
-            Try
-                Dim DAO As New ClientesDAO()
+            If TextBox4.Text <> "" Then
+                Dim dt1 = DataGridView1.DataSource
+                Dim vista As New DataView(dt1)
+                vista.RowFilter = $"CONVERT(Nombre, 'System.String') LIKE '%{TextBox4.Text}%'"
+                DataGridView1.DataSource = vista.ToTable()
+            Else
+                FuncionesClientes.verClientes(DataGridView1)
+            End If
 
-                DataGridView1.DataSource = DAO.Buscar(nombre)
-
-            Catch ex As Exception
-                Console.WriteLine("Error al obtener los registros: " & ex.Message)
-            End Try
         End Sub
 
 

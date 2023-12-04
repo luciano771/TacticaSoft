@@ -34,7 +34,7 @@ Namespace TacticaSoft
 
 
         Private Sub InitializeComponent()
-            Me.ererere = New System.Windows.Forms.TabControl()
+            Me.TabControl = New System.Windows.Forms.TabControl()
             Me.TabPage1 = New System.Windows.Forms.TabPage()
             Me.TabPage2 = New System.Windows.Forms.TabPage()
             Me.TabPage3 = New System.Windows.Forms.TabPage()
@@ -43,21 +43,21 @@ Namespace TacticaSoft
             Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker()
             Me.Button2 = New System.Windows.Forms.Button()
             Me.Button1 = New System.Windows.Forms.Button()
-            Me.ererere.SuspendLayout()
+            Me.TabControl.SuspendLayout()
             Me.TabPage4.SuspendLayout()
             Me.SuspendLayout()
             '
-            'ererere
+            'TabControl
             '
-            Me.ererere.Controls.Add(Me.TabPage1)
-            Me.ererere.Controls.Add(Me.TabPage2)
-            Me.ererere.Controls.Add(Me.TabPage3)
-            Me.ererere.Controls.Add(Me.TabPage4)
-            Me.ererere.Location = New System.Drawing.Point(12, 12)
-            Me.ererere.Name = "ererere"
-            Me.ererere.SelectedIndex = 0
-            Me.ererere.Size = New System.Drawing.Size(1183, 498)
-            Me.ererere.TabIndex = 3
+            Me.TabControl.Controls.Add(Me.TabPage1)
+            Me.TabControl.Controls.Add(Me.TabPage2)
+            Me.TabControl.Controls.Add(Me.TabPage3)
+            Me.TabControl.Controls.Add(Me.TabPage4)
+            Me.TabControl.Location = New System.Drawing.Point(12, 12)
+            Me.TabControl.Name = "TabControl"
+            Me.TabControl.SelectedIndex = 0
+            Me.TabControl.Size = New System.Drawing.Size(1183, 498)
+            Me.TabControl.TabIndex = 3
             '
             'TabPage1
             '
@@ -106,21 +106,21 @@ Namespace TacticaSoft
             '
             'DateTimePicker2
             '
-            Me.DateTimePicker2.Location = New System.Drawing.Point(578, 229)
+            Me.DateTimePicker2.Location = New System.Drawing.Point(481, 230)
             Me.DateTimePicker2.Name = "DateTimePicker2"
             Me.DateTimePicker2.Size = New System.Drawing.Size(200, 20)
             Me.DateTimePicker2.TabIndex = 3
             '
             'DateTimePicker1
             '
-            Me.DateTimePicker1.Location = New System.Drawing.Point(363, 229)
+            Me.DateTimePicker1.Location = New System.Drawing.Point(266, 230)
             Me.DateTimePicker1.Name = "DateTimePicker1"
             Me.DateTimePicker1.Size = New System.Drawing.Size(200, 20)
             Me.DateTimePicker1.TabIndex = 2
             '
             'Button2
             '
-            Me.Button2.Location = New System.Drawing.Point(187, 226)
+            Me.Button2.Location = New System.Drawing.Point(90, 227)
             Me.Button2.Name = "Button2"
             Me.Button2.Size = New System.Drawing.Size(156, 23)
             Me.Button2.TabIndex = 1
@@ -129,7 +129,7 @@ Namespace TacticaSoft
             '
             'Button1
             '
-            Me.Button1.Location = New System.Drawing.Point(187, 55)
+            Me.Button1.Location = New System.Drawing.Point(90, 93)
             Me.Button1.Name = "Button1"
             Me.Button1.Size = New System.Drawing.Size(156, 23)
             Me.Button1.TabIndex = 0
@@ -139,23 +139,23 @@ Namespace TacticaSoft
             'Form1
             '
             Me.ClientSize = New System.Drawing.Size(1260, 570)
-            Me.Controls.Add(Me.ererere)
+            Me.Controls.Add(Me.TabControl)
             Me.Name = "Form1"
-            Me.ererere.ResumeLayout(False)
+            Me.TabControl.ResumeLayout(False)
             Me.TabPage4.ResumeLayout(False)
             Me.ResumeLayout(False)
 
         End Sub
 
-        Friend WithEvents ererere As TabControl
+        Friend WithEvents TabControl As TabControl
         Friend WithEvents TabPage1 As TabPage
         Friend WithEvents TabPage2 As TabPage
         Friend WithEvents TabPage3 As TabPage
 
 
 
-        Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ererere.SelectedIndexChanged
-            Select Case ererere.SelectedTab.Text
+        Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl.SelectedIndexChanged
+            Select Case TabControl.SelectedTab.Text
                 Case "Clientes"
                     MostrarClientesForm()
                 Case "Productos"
@@ -176,7 +176,13 @@ Namespace TacticaSoft
             Else
                 clientesForm.Show()
             End If
+            If Not ventasForm Is Nothing Then
+                ventasForm.Hide()
+            End If
 
+            If Not productosForm Is Nothing Then
+                productosForm.Hide()
+            End If
         End Sub
 
         Private Sub MostrarProductosForm()
@@ -190,7 +196,13 @@ Namespace TacticaSoft
             Else
                 productosForm.Show()
             End If
+            If Not ventasForm Is Nothing Then
+                ventasForm.Hide()
+            End If
 
+            If Not clientesForm Is Nothing Then
+                clientesForm.Hide()
+            End If
         End Sub
 
 
@@ -205,7 +217,13 @@ Namespace TacticaSoft
             Else
                 ventasForm.Show()
             End If
+            If Not productosForm Is Nothing Then
+                productosForm.Hide()
+            End If
 
+            If Not clientesForm Is Nothing Then
+                clientesForm.Hide()
+            End If
         End Sub
 
         Friend WithEvents TabPage4 As TabPage

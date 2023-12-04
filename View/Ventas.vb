@@ -43,6 +43,12 @@ Namespace TacticaSoft
 
             Dim DAO As New VentasItemsDAO
             Dim DAOItems As New VentasDAO
+            Dim ventasitemsDAO As New VentasItemsDAO
+            Dim ventasDAO As New VentasDAO
+            Dim ventasitemsDTO As New VentasitemsDTO
+            Dim ventasDTO As New VentasDTO
+
+
             If (ID_ITEM_VENTA = 0 Or ID_VENTA = 0) Then
                 MsgBox("Debe seleccionar un item del listado")
                 Return
@@ -51,18 +57,42 @@ Namespace TacticaSoft
             Await DAO.EliminarItemVenta(ID_ITEM_VENTA)
             Await DAOItems.EliminarVenta(ID_VENTA)
 
-            FuncionesVentas.VerVentasItems(DataGridView1)
-            FuncionesVentas.verVentas(DataGridView2)
+
+
+
+
+            Dim ventas As List(Of VentasitemsDTO) = Await ventasitemsDAO.BuscarPorIdVenta(ID_VENTA)
+            Dim total As Integer
+            For Each item In ventas
+                total += item.preciounitario * item.cantidad
+            Next
+            ventasDTO.ID = ID_VENTA
+            ventasDTO.total = total
+            Await ventasDAO.ActualizarProducto(ventasDTO)
+
 
             ID_ITEM_VENTA = 0
             ID_VENTA = 0
 
+            FuncionesVentas.VerVentasItems(DataGridView1)
+            FuncionesVentas.verVentas(DataGridView2)
+
         End Sub
 
         Private Sub TextBox2_TextChanged_2(sender As Object, e As EventArgs) Handles TextBox2.Click
-            Form1.ventasForm.DataGridView2.Visible = True
             Dim FormProductos As New TacticaSoft.Productos()
             FormProductos.DataGridView2.Visible = True
+            FormProductos.Button1.Visible = False
+            FormProductos.Button2.Visible = False
+            FormProductos.Button3.Visible = False
+            FormProductos.TextBox1.Visible = False
+            FormProductos.TextBox2.Visible = False
+            FormProductos.TextBox3.Visible = False
+            FormProductos.Label3.Visible = False
+            FormProductos.Label4.Visible = False
+            FormProductos.Label5.Visible = False
+            FormProductos.Button4.Visible = True
+            FormProductos.Button4.Enabled = True
             FormProductos.Show()
         End Sub
 
@@ -188,7 +218,7 @@ Namespace TacticaSoft
             Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
             Me.DataGridView1.Location = New System.Drawing.Point(22, 199)
             Me.DataGridView1.Name = "DataGridView1"
-            Me.DataGridView1.Size = New System.Drawing.Size(542, 241)
+            Me.DataGridView1.Size = New System.Drawing.Size(721, 241)
             Me.DataGridView1.TabIndex = 0
             '
             'Button1
@@ -219,9 +249,9 @@ Namespace TacticaSoft
             'DataGridView2
             '
             Me.DataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.DataGridView2.Location = New System.Drawing.Point(594, 199)
+            Me.DataGridView2.Location = New System.Drawing.Point(754, 199)
             Me.DataGridView2.Name = "DataGridView2"
-            Me.DataGridView2.Size = New System.Drawing.Size(576, 241)
+            Me.DataGridView2.Size = New System.Drawing.Size(386, 241)
             Me.DataGridView2.TabIndex = 6
             '
             'Button2
@@ -244,6 +274,7 @@ Namespace TacticaSoft
             '
             'TextBox3
             '
+            Me.TextBox3.Enabled = False
             Me.TextBox3.Location = New System.Drawing.Point(145, 129)
             Me.TextBox3.Name = "TextBox3"
             Me.TextBox3.Size = New System.Drawing.Size(100, 20)
@@ -261,7 +292,7 @@ Namespace TacticaSoft
             'Label2
             '
             Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(614, 83)
+            Me.Label2.Location = New System.Drawing.Point(659, 92)
             Me.Label2.Name = "Label2"
             Me.Label2.Size = New System.Drawing.Size(84, 13)
             Me.Label2.TabIndex = 14
@@ -269,28 +300,28 @@ Namespace TacticaSoft
             '
             'TextBox6
             '
-            Me.TextBox6.Location = New System.Drawing.Point(729, 80)
+            Me.TextBox6.Location = New System.Drawing.Point(774, 89)
             Me.TextBox6.Name = "TextBox6"
             Me.TextBox6.Size = New System.Drawing.Size(143, 20)
             Me.TextBox6.TabIndex = 15
             '
             'DateTimePicker1
             '
-            Me.DateTimePicker1.Location = New System.Drawing.Point(729, 35)
+            Me.DateTimePicker1.Location = New System.Drawing.Point(787, 40)
             Me.DateTimePicker1.Name = "DateTimePicker1"
             Me.DateTimePicker1.Size = New System.Drawing.Size(109, 20)
             Me.DateTimePicker1.TabIndex = 18
             '
             'DateTimePicker2
             '
-            Me.DateTimePicker2.Location = New System.Drawing.Point(856, 35)
+            Me.DateTimePicker2.Location = New System.Drawing.Point(914, 40)
             Me.DateTimePicker2.Name = "DateTimePicker2"
             Me.DateTimePicker2.Size = New System.Drawing.Size(109, 20)
             Me.DateTimePicker2.TabIndex = 19
             '
             'Button4
             '
-            Me.Button4.Location = New System.Drawing.Point(594, 32)
+            Me.Button4.Location = New System.Drawing.Point(652, 37)
             Me.Button4.Name = "Button4"
             Me.Button4.Size = New System.Drawing.Size(119, 23)
             Me.Button4.TabIndex = 20
@@ -302,7 +333,7 @@ Namespace TacticaSoft
             Me.ComboBox1.FormattingEnabled = True
             Me.ComboBox1.Location = New System.Drawing.Point(367, 39)
             Me.ComboBox1.Name = "ComboBox1"
-            Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
+            Me.ComboBox1.Size = New System.Drawing.Size(197, 21)
             Me.ComboBox1.TabIndex = 21
             '
             'Ventas
@@ -350,7 +381,6 @@ Namespace TacticaSoft
         Friend WithEvents DateTimePicker2 As DateTimePicker
         Friend WithEvents Button4 As Button
         Friend WithEvents ComboBox1 As ComboBox
-
 
     End Class
 End Namespace

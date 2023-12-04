@@ -28,14 +28,19 @@ Namespace TacticaSoft
 
 
         Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
-            ID = DataGridView1.Rows(e.RowIndex).Cells(0).Value
-            Funciones.FuncVentas.idcliente = ID
+            If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 AndAlso DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value IsNot Nothing Then
+
+                ID = DataGridView1.Rows(e.RowIndex).Cells(0).Value
+                Funciones.FuncVentas.idcliente = ID
+
+                If Form1.ventasForm.Visible Then
+                    Form1.ventasForm.TextBox1.Text = DataGridView1.Rows(e.RowIndex).Cells(1).Value
+                    Form1.ventasForm.TextBox1.Refresh()
+                    Me.Hide()
+                End If
+            End If
 
 
-            Form1.ventasForm.TextBox1.Text = DataGridView1.Rows(e.RowIndex).Cells(1).Value
-            Form1.ventasForm.TextBox1.Refresh()
-
-            Me.Hide()
 
 
         End Sub
@@ -76,6 +81,7 @@ Namespace TacticaSoft
 
         Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
             FuncionesClientes.actualizarClientes(ID, TextBox1.Text, TextBox2.Text, TextBox3.Text)
+            FuncionesClientes.verClientes(DataGridView1)
         End Sub
 
 
@@ -113,6 +119,9 @@ Namespace TacticaSoft
             Me.TextBox3 = New System.Windows.Forms.TextBox()
             Me.TextBox4 = New System.Windows.Forms.TextBox()
             Me.Label1 = New System.Windows.Forms.Label()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.Label3 = New System.Windows.Forms.Label()
+            Me.Label4 = New System.Windows.Forms.Label()
             CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
@@ -135,7 +144,7 @@ Namespace TacticaSoft
             '
             'TextBox1
             '
-            Me.TextBox1.Location = New System.Drawing.Point(593, 94)
+            Me.TextBox1.Location = New System.Drawing.Point(670, 78)
             Me.TextBox1.Name = "TextBox1"
             Me.TextBox1.Size = New System.Drawing.Size(100, 20)
             Me.TextBox1.TabIndex = 2
@@ -160,21 +169,21 @@ Namespace TacticaSoft
             '
             'TextBox2
             '
-            Me.TextBox2.Location = New System.Drawing.Point(715, 94)
+            Me.TextBox2.Location = New System.Drawing.Point(670, 130)
             Me.TextBox2.Name = "TextBox2"
             Me.TextBox2.Size = New System.Drawing.Size(100, 20)
             Me.TextBox2.TabIndex = 5
             '
             'TextBox3
             '
-            Me.TextBox3.Location = New System.Drawing.Point(830, 94)
+            Me.TextBox3.Location = New System.Drawing.Point(670, 104)
             Me.TextBox3.Name = "TextBox3"
             Me.TextBox3.Size = New System.Drawing.Size(100, 20)
             Me.TextBox3.TabIndex = 6
             '
             'TextBox4
             '
-            Me.TextBox4.Location = New System.Drawing.Point(726, 178)
+            Me.TextBox4.Location = New System.Drawing.Point(738, 162)
             Me.TextBox4.Name = "TextBox4"
             Me.TextBox4.Size = New System.Drawing.Size(100, 20)
             Me.TextBox4.TabIndex = 8
@@ -182,15 +191,45 @@ Namespace TacticaSoft
             'Label1
             '
             Me.Label1.AutoSize = True
-            Me.Label1.Location = New System.Drawing.Point(608, 181)
+            Me.Label1.Location = New System.Drawing.Point(620, 165)
             Me.Label1.Name = "Label1"
             Me.Label1.Size = New System.Drawing.Size(96, 13)
             Me.Label1.TabIndex = 9
             Me.Label1.Text = "Buscar por nombre"
             '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(620, 78)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(44, 13)
+            Me.Label2.TabIndex = 10
+            Me.Label2.Text = "Nombre"
+            '
+            'Label3
+            '
+            Me.Label3.AutoSize = True
+            Me.Label3.Location = New System.Drawing.Point(620, 104)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(38, 13)
+            Me.Label3.TabIndex = 11
+            Me.Label3.Text = "Correo"
+            '
+            'Label4
+            '
+            Me.Label4.AutoSize = True
+            Me.Label4.Location = New System.Drawing.Point(620, 130)
+            Me.Label4.Name = "Label4"
+            Me.Label4.Size = New System.Drawing.Size(49, 13)
+            Me.Label4.TabIndex = 12
+            Me.Label4.Text = "Telefono"
+            '
             'Clientes
             '
             Me.ClientSize = New System.Drawing.Size(980, 368)
+            Me.Controls.Add(Me.Label4)
+            Me.Controls.Add(Me.Label3)
+            Me.Controls.Add(Me.Label2)
             Me.Controls.Add(Me.Label1)
             Me.Controls.Add(Me.TextBox4)
             Me.Controls.Add(Me.TextBox3)
@@ -216,7 +255,9 @@ Namespace TacticaSoft
         Friend WithEvents TextBox3 As TextBox
         Friend WithEvents TextBox4 As TextBox
         Friend WithEvents Label1 As Label
-
+        Friend WithEvents Label2 As Label
+        Friend WithEvents Label3 As Label
+        Friend WithEvents Label4 As Label
 
     End Class
 End Namespace

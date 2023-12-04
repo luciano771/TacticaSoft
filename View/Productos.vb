@@ -18,32 +18,37 @@ Namespace TacticaSoft
             FuncionesProductos.VerProductos(DataGridView1)
             llenarCmbCategorias()
             DataGridView2.Visible = False
+            Button4.Visible = False
+            Button4.Enabled = False
         End Sub
 
 
         Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
-            ID_Producto = DataGridView1.Rows(e.RowIndex).Cells(0).Value
-            Dim Precio = DataGridView1.Rows(e.RowIndex).Cells(2).Value
-            Dim Nombre = DataGridView1.Rows(e.RowIndex).Cells(1).Value
+            If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 AndAlso DataGridView1.Rows(e.RowIndex).Cells(e.ColumnIndex).Value IsNot Nothing Then
+                ID_Producto = DataGridView1.Rows(e.RowIndex).Cells(0).Value
+                Dim Precio = DataGridView1.Rows(e.RowIndex).Cells(2).Value
+                Dim Nombre = DataGridView1.Rows(e.RowIndex).Cells(1).Value
+                dt = FuncionesProductos.GrillaSeleccionarProductos(dt, ID_Producto, Nombre, Precio)
+                DataGridView2.AllowUserToAddRows = False
+                DataGridView2.DataSource = dt
+                Funciones.FuncVentas.dtProductos = dt
 
-            dt = FuncionesProductos.GrillaSeleccionarProductos(dt, ID_Producto, Nombre, Precio)
-            DataGridView2.AllowUserToAddRows = False
-            DataGridView2.DataSource = dt
-            Funciones.FuncVentas.dtProductos = dt
+                Dim items As New List(Of String)()
 
-            Dim items As New List(Of String)()
-
-            For Each row As DataRow In dt.Rows
-                Dim nombreCantidad As String = $"{row("Nombre")} - {row("Cantidad")}"
-                items.Add(nombreCantidad)
-            Next
+                For Each row As DataRow In dt.Rows
+                    Dim nombreCantidad As String = $"{row("Nombre")} - {row("Cantidad")}"
+                    items.Add(nombreCantidad)
+                Next
 
 
 
-            If Not Form1.ventasForm Is Nothing Then
-                Form1.ventasForm.ComboBox1.DataSource = items
-                Form1.ventasForm.ComboBox1.Refresh()
+                If Form1.ventasForm.Visible Then
+                    Form1.ventasForm.ComboBox1.DataSource = items
+                    Form1.ventasForm.ComboBox1.Refresh()
+                End If
             End If
+
+
         End Sub
 
 
@@ -175,6 +180,10 @@ Namespace TacticaSoft
             Me.ComboBox1 = New System.Windows.Forms.ComboBox()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.DataGridView2 = New System.Windows.Forms.DataGridView()
+            Me.Button4 = New System.Windows.Forms.Button()
+            Me.Label3 = New System.Windows.Forms.Label()
+            Me.Label4 = New System.Windows.Forms.Label()
+            Me.Label5 = New System.Windows.Forms.Label()
             CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.DataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
@@ -216,21 +225,21 @@ Namespace TacticaSoft
             '
             'TextBox1
             '
-            Me.TextBox1.Location = New System.Drawing.Point(579, 52)
+            Me.TextBox1.Location = New System.Drawing.Point(590, 52)
             Me.TextBox1.Name = "TextBox1"
             Me.TextBox1.Size = New System.Drawing.Size(100, 20)
             Me.TextBox1.TabIndex = 5
             '
             'TextBox2
             '
-            Me.TextBox2.Location = New System.Drawing.Point(699, 52)
+            Me.TextBox2.Location = New System.Drawing.Point(739, 52)
             Me.TextBox2.Name = "TextBox2"
             Me.TextBox2.Size = New System.Drawing.Size(100, 20)
             Me.TextBox2.TabIndex = 6
             '
             'TextBox3
             '
-            Me.TextBox3.Location = New System.Drawing.Point(818, 52)
+            Me.TextBox3.Location = New System.Drawing.Point(903, 52)
             Me.TextBox3.Name = "TextBox3"
             Me.TextBox3.Size = New System.Drawing.Size(100, 20)
             Me.TextBox3.TabIndex = 7
@@ -276,9 +285,49 @@ Namespace TacticaSoft
             Me.DataGridView2.Size = New System.Drawing.Size(416, 215)
             Me.DataGridView2.TabIndex = 12
             '
+            'Button4
+            '
+            Me.Button4.Location = New System.Drawing.Point(685, 23)
+            Me.Button4.Name = "Button4"
+            Me.Button4.Size = New System.Drawing.Size(75, 23)
+            Me.Button4.TabIndex = 13
+            Me.Button4.Text = "Aceptar"
+            Me.Button4.UseVisualStyleBackColor = True
+            '
+            'Label3
+            '
+            Me.Label3.AutoSize = True
+            Me.Label3.Location = New System.Drawing.Point(540, 55)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(44, 13)
+            Me.Label3.TabIndex = 14
+            Me.Label3.Text = "Nombre"
+            '
+            'Label4
+            '
+            Me.Label4.AutoSize = True
+            Me.Label4.Location = New System.Drawing.Point(696, 55)
+            Me.Label4.Name = "Label4"
+            Me.Label4.Size = New System.Drawing.Size(37, 13)
+            Me.Label4.TabIndex = 15
+            Me.Label4.Text = "Precio"
+            '
+            'Label5
+            '
+            Me.Label5.AutoSize = True
+            Me.Label5.Location = New System.Drawing.Point(845, 55)
+            Me.Label5.Name = "Label5"
+            Me.Label5.Size = New System.Drawing.Size(52, 13)
+            Me.Label5.TabIndex = 16
+            Me.Label5.Text = "Categoria"
+            '
             'Productos
             '
-            Me.ClientSize = New System.Drawing.Size(943, 378)
+            Me.ClientSize = New System.Drawing.Size(1183, 378)
+            Me.Controls.Add(Me.Label5)
+            Me.Controls.Add(Me.Label4)
+            Me.Controls.Add(Me.Label3)
+            Me.Controls.Add(Me.Button4)
             Me.Controls.Add(Me.DataGridView2)
             Me.Controls.Add(Me.Label2)
             Me.Controls.Add(Me.ComboBox1)
@@ -311,8 +360,16 @@ Namespace TacticaSoft
         Friend WithEvents ComboBox1 As ComboBox
         Friend WithEvents Label2 As Label
         Friend WithEvents DataGridView2 As DataGridView
+        Friend WithEvents Button4 As Button
 
+        Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
 
+            Me.Hide()
+        End Sub
+
+        Friend WithEvents Label3 As Label
+        Friend WithEvents Label4 As Label
+        Friend WithEvents Label5 As Label
     End Class
 End Namespace
 

@@ -21,7 +21,7 @@ Namespace TacticaSoft.Funciones
             For Each row As DataRow In dt.Rows
                 If Convert.ToInt32(row("ID")) = ID_Producto Then
                     row("Cantidad") = Convert.ToInt32(row("Cantidad")) + 1
-                    row("Precio") = Convert.ToInt32(row("Cantidad")) * Convert.ToDecimal(row("Precio"))
+                    row("Precio") = Convert.ToInt32(row("Precio")) + Convert.ToInt32(precio)
                     found = True
                     Exit For
                 End If
